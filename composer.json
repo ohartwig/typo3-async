@@ -31,7 +31,7 @@
         "symfony/doctrine-messenger": "^7.4.20",
         "symfony/mailer": "^7.4.12",
         "symfony/messenger": "^7.4.20",
-        "symfony/mime": "^7.4",
+        "symfony/mime": "^7.4.12",
         "typo3/cms-core": "^14.3"
     },
     "require-dev": {
