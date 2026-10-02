@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-async/compare/v1.2.1...v1.3.0) (2026-10-02)
+
+### :sparkles: Features
+
+* commands to see, return and drop parked messages ([a667cb8](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-async/commit/a667cb8f9a9241ed44781302cb19212c614183bf))
+* the consumer writes queue figures for Prometheus ([70870e5](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-async/commit/70870e5817ddb487ee1a466ff0decf01cb1832b5))
+
 ## [1.2.1](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-async/compare/v1.2.0...v1.2.1) (2026-10-02)
 
 ### :bug: Fixes
