@@ -88,4 +88,27 @@ final class AsyncMailTest extends FunctionalTestCase
         self::assertFileExists($this->mbox);
         self::assertStringContainsString('Subject: Order received', (string) file_get_contents($this->mbox));
     }
+
+    #[Test]
+    public function theConsumerWritesTheQueueFiguresWhileItRuns(): void
+    {
+        $file = sys_get_temp_dir() . '/koh-async-metrics-' . getmypid();
+        @unlink($file);
+        putenv('KOH_ASYNC_METRICS_FILE=' . $file);
+        $this->get(MailerInterface::class)->send(
+            new Email()->from('shop@example.org')->to('customer@example.org')->subject('Waiting')->text('.')
+        );
+
+        // An empty receiver list would block; one idle loop on `images` is
+        // enough for the worker to turn once and the listener to write.
+        $consume = new CommandTester($this->get(CommandRegistry::class)->get('messenger:consume'));
+        $consume->execute(['receivers' => ['koh_async_images'], '--time-limit' => 1]);
+        putenv('KOH_ASYNC_METRICS_FILE');
+
+        self::assertFileExists($file, 'written from the worker loop');
+        $text = (string) file_get_contents($file);
+        @unlink($file);
+        self::assertStringContainsString("koh_async_queue_messages{queue=\"mail\"} 1\n", $text, 'the mail nobody consumed here');
+        self::assertMatchesRegularExpression('/koh_async_queue_oldest_age_seconds\{queue="mail"\} [0-9]+\n/', $text);
+    }
 }
