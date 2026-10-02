@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.1.1](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-async/compare/v1.1.0...v1.1.1) (2026-10-02)
+
+### :bug: Fixes
+
+* drop ext_conf_template.txt, extension:setup cannot write settings.php ([e3cef1a](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-async/commit/e3cef1a19afa104b5f65ccbab6524a9d4fce62c5))
+
 ## [1.1.0](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-async/compare/v1.0.2...v1.1.0) (2026-10-02)
 
 ### :sparkles: Features
