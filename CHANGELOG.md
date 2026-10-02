@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.2.0](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-async/compare/v1.1.1...v1.2.0) (2026-10-02)
+
+### :sparkles: Features
+
+* learn image profiles from what the site has rendered ([5fba2a7](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-async/commit/5fba2a79afe9b001626ce513538d03ce4334f571))
+
 ## [1.1.1](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-async/compare/v1.1.0...v1.1.1) (2026-10-02)
 
 ### :bug: Fixes
