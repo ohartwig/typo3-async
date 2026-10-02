@@ -34,9 +34,18 @@ MESSENGER_ASYNC=1 vendor/bin/typo3 messenger:consume koh_async_mail koh_async_im
 ```
 
 The web pods need `MESSENGER_ASYNC=1` too, or they keep sending in the
-request. Messages in the failure queue can be inspected in
-`sys_messenger_messages` (`queue_name = 'failed'`); the `ErrorDetailsStamp`
-on each one names the exception.
+request. Parked messages (failure queue, after three attempts):
+
+```bash
+vendor/bin/typo3 messenger:failed:show            # list; -v shows the exception
+vendor/bin/typo3 koh-async:failed:retry --all     # back into their queue
+vendor/bin/typo3 messenger:failed:remove <id> --force
+```
+
+`koh-async:failed:retry` returns a message to the queue it came from as a new
+message; the consumer then handles it with the usual retries. Symfony's
+`messenger:failed:retry` is deliberately not registered: it would handle the
+message outside TYPO3's retry and failure listeners.
 
 ## Image variants
 
@@ -82,6 +91,27 @@ $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['koh_async']['imageProfiles'] = [
 
 The consumer must read `koh_async_images` (see Running it) -- otherwise the
 messages wait in the queue.
+
+## Queue figures for monitoring
+
+Where `KOH_ASYNC_METRICS_FILE` names a file, the consumer writes the queue
+figures there from its worker loop, at most every 15 seconds:
+
+```
+koh_async_queue_messages{queue="mail"} 0
+koh_async_queue_oldest_age_seconds{queue="mail"} 0
+koh_async_metrics_timestamp_seconds 1790960000
+```
+
+`oldest_age_seconds` counts only messages that are due -- a retry waiting
+for its delay is not overdue. The timestamp comes from the loop itself, so
+one that stops moving means the consumer hangs, which a process probe does
+not see. A sidecar serves the file to Prometheus without TYPO3 or database
+access:
+
+```bash
+php -S 0.0.0.0:9106 vendor/koh/typo3-async/Resources/Private/Php/serve-metrics.php
+```
 
 ## Requirements
 
