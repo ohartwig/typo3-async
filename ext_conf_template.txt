@@ -1,2 +1,0 @@
-# cat=images; type=string; label=Image profiles: JSON list of processing instructions to produce after an upload or a crop change, exactly as the templates request them. Empty means off. Run koh-async:image-profiles:suggest for a list from this site's processed files.
-imageProfiles =

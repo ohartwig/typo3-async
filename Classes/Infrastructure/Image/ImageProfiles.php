@@ -29,9 +29,11 @@ namespace Koh\Typo3Async\Infrastructure\Image;
  *       handler replaces it, in place, with the absolute crop area, as Fluid's
  *       ImageViewHelper builds it.
  *
- * Configured as a JSON list in the extension configuration
- * ($GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['koh_async']['imageProfiles']).
- * Empty or invalid means off: nothing is queued.
+ * Configured as a list -- PHP array or JSON string -- in
+ * $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['koh_async']['imageProfiles'],
+ * typically from config/system/additional.php. Empty or invalid means off:
+ * nothing is queued. There is deliberately no ext_conf_template.txt, see
+ * ExtensionLayoutTest.
  */
 final class ImageProfiles
 {
