@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.0.1](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-async/compare/v1.0.0...v1.0.1) (2026-10-02)
+
+### :bug: Fixes
+
+* **deps:** update composer packages ([de19d21](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-async/commit/de19d2178e756250969a1018b519ce2ae0b9549b))
+
+### :repeat: Continuous Integrations
+
+* mirror release tags to github.com/ohartwig/typo3-async ([937eb59](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-async/commit/937eb592f98bccb998a85e603545456be909b218))
+
 ## [1.0.0] (2026-10-02)
 
 ### :sparkles: Features
