@@ -40,35 +40,48 @@ on each one names the exception.
 
 ## Image variants
 
-Off until `imageProfiles` is set, as a PHP array or a JSON string, in
-`config/system/additional.php`:
-`$GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['koh_async']['imageProfiles']`. Each
-entry is one processing instruction array, and it must be the array the
-template builds, key for key and in the same order: TYPO3 finds a processed
-file again by a checksum over that array, so `{"width":640}` and
-`{"width":640,"height":null}` are two different variants. Copy them from
-what the site already requests:
+After an upload, a replace or a saved crop, the consumer produces the sizes
+the site's templates request -- so the first visitor finds them instead of
+waiting for ImageMagick. Nothing to configure: the sizes are **learned** from
+what the site has already rendered.
+
+- TYPO3 keeps the instruction array of every processed file in
+  `sys_file_processedfile`, keys in the order the template built them. That
+  order matters: TYPO3 finds a processed file again by a checksum over the
+  array, so `{"width":640}` and `{"width":640,"height":null}` are two
+  variants. Learned arrays are copied, never rebuilt.
+- A configuration requested for at least 10 % of the originals (and at least
+  three) is produced for every new upload.
+- A crop is learned as the name of its crop variant (`hero`, `xs`, ...): the
+  stored area is compared with the variants saved on the file's references.
+  The area itself is computed per reference when its crop is saved, so two
+  content elements with different crops each get their own image.
+- What the consumer made itself is noted in `tx_kohasync_pregenerated` and is
+  no evidence: a size a template stops requesting drops out instead of
+  confirming itself with every upload. After a template redesign, "Remove
+  processed files" in the maintenance module starts the evidence afresh.
+- The consumer re-learns hourly.
+
+What it would produce right now:
 
 ```bash
-vendor/bin/typo3 koh-async:image-profiles:suggest --min-count=20 -v
+vendor/bin/typo3 koh-async:image-profiles:suggest -v
 ```
 
-```json
-[
-  {"width": 640, "fileExtension": "avif"},
-  {"width": 1280, "height": null, "minWidth": null, "minHeight": null, "maxWidth": null, "maxHeight": null, "crop": null},
-  {"width": 1280, "height": null, "minWidth": null, "minHeight": null, "maxWidth": null, "maxHeight": null, "crop": "default"}
-]
+Settings, in `config/system/additional.php`, all optional:
+
+```php
+// percent of originals; default 10, 0 switches learning off
+$GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['koh_async']['learnImageProfiles'] = 10;
+// produced in addition, as PHP array or JSON string; a string `crop` names
+// the crop variant
+$GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['koh_async']['imageProfiles'] = [
+    ['width' => 1280, 'height' => null, 'minWidth' => null, 'minHeight' => null, 'maxWidth' => null, 'maxHeight' => null, 'crop' => 'hero'],
+];
 ```
 
-`crop` absent or null: a file profile, produced on upload and replace. `crop`
-a string: a reference profile, produced when a reference's crop is saved; the
-string names the crop variant the template renders, and the consumer puts the
-absolute crop area in its place, as the `ImageViewHelper` does. The command
-cannot tell which variant a template used and suggests `default`.
-
-Set `imageProfiles` only once the consumer reads `koh_async_images` -- before
-that, the messages wait in the queue.
+The consumer must read `koh_async_images` (see Running it) -- otherwise the
+messages wait in the queue.
 
 ## Requirements
 

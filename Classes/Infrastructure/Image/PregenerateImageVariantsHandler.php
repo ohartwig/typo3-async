@@ -8,8 +8,10 @@ use Psr\Log\LoggerInterface;
 use TYPO3\CMS\Core\Imaging\ImageManipulation\CropVariantCollection;
 use TYPO3\CMS\Core\Resource\Exception\FileDoesNotExistException;
 use TYPO3\CMS\Core\Resource\Exception\ResourceDoesNotExistException;
+use TYPO3\CMS\Core\Resource\File;
 use TYPO3\CMS\Core\Resource\FileInterface;
 use TYPO3\CMS\Core\Resource\ProcessedFile;
+use TYPO3\CMS\Core\Resource\ProcessedFileRepository;
 use TYPO3\CMS\Core\Resource\ResourceFactory;
 
 /**
@@ -32,21 +34,27 @@ final class PregenerateImageVariantsHandler
 {
     public function __construct(
         private readonly ResourceFactory $resourceFactory,
-        private readonly ImageProfiles $profiles,
+        private readonly ImageProfiles $configured,
+        private readonly LearnedImageProfiles $learned,
+        private readonly ProcessedFileRepository $processedFiles,
+        private readonly PregeneratedLedger $ledger,
         private readonly LoggerInterface $logger,
     ) {}
 
     public function __invoke(PregenerateImageVariants $message): void
     {
+        $profiles = $this->configured->learns()
+            ? $this->configured->withLearned(array_column($this->learned->learn($this->configured->learnShare(), time()), 'profile'))
+            : $this->configured;
         if (null !== $message->fileUid) {
-            $this->forFile($message->fileUid);
+            $this->forFile($message->fileUid, $profiles);
         }
         if (null !== $message->referenceUid) {
-            $this->forReference($message->referenceUid);
+            $this->forReference($message->referenceUid, $profiles);
         }
     }
 
-    private function forFile(int $uid): void
+    private function forFile(int $uid, ImageProfiles $profiles): void
     {
         try {
             $file = $this->resourceFactory->getFileObject($uid);
@@ -58,12 +66,12 @@ final class PregenerateImageVariantsHandler
         if ($file->isMissing()) {
             return;
         }
-        foreach ($this->profiles->forFiles() as $instructions) {
-            $file->process(ProcessedFile::CONTEXT_IMAGECROPSCALEMASK, $instructions);
+        foreach ($profiles->forFiles() as $instructions) {
+            $this->produce($file, $instructions);
         }
     }
 
-    private function forReference(int $uid): void
+    private function forReference(int $uid, ImageProfiles $profiles): void
     {
         try {
             $reference = $this->resourceFactory->getFileReferenceObject($uid);
@@ -77,8 +85,25 @@ final class PregenerateImageVariantsHandler
             return;
         }
         $crops = CropVariantCollection::create((string) $reference->getProperty('crop'));
-        foreach ($this->profiles->forReferences() as $profile) {
-            $file->process(ProcessedFile::CONTEXT_IMAGECROPSCALEMASK, self::instructions($profile, $crops, $reference));
+        foreach ($profiles->forReferences() as $profile) {
+            $this->produce($file, self::instructions($profile, $crops, $reference));
+        }
+    }
+
+    /**
+     * Processes, and notes the result in the ledger only when this call made
+     * it -- a variant the frontend requested before stays evidence.
+     *
+     * @param array<string, mixed> $instructions
+     */
+    private function produce(File $file, array $instructions): void
+    {
+        $known = $this->processedFiles
+            ->findOneByOriginalFileAndTaskTypeAndConfiguration($file, ProcessedFile::CONTEXT_IMAGECROPSCALEMASK, $instructions)
+            ->isPersisted();
+        $processed = $file->process(ProcessedFile::CONTEXT_IMAGECROPSCALEMASK, $instructions);
+        if (!$known && $processed->isPersisted()) {
+            $this->ledger->record($processed->getUid());
         }
     }
 
