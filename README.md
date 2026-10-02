@@ -34,9 +34,18 @@ MESSENGER_ASYNC=1 vendor/bin/typo3 messenger:consume koh_async_mail koh_async_im
 ```
 
 The web pods need `MESSENGER_ASYNC=1` too, or they keep sending in the
-request. Messages in the failure queue can be inspected in
-`sys_messenger_messages` (`queue_name = 'failed'`); the `ErrorDetailsStamp`
-on each one names the exception.
+request. Parked messages (failure queue, after three attempts):
+
+```bash
+vendor/bin/typo3 messenger:failed:show            # list; -v shows the exception
+vendor/bin/typo3 koh-async:failed:retry --all     # back into their queue
+vendor/bin/typo3 messenger:failed:remove <id> --force
+```
+
+`koh-async:failed:retry` returns a message to the queue it came from as a new
+message; the consumer then handles it with the usual retries. Symfony's
+`messenger:failed:retry` is deliberately not registered: it would handle the
+message outside TYPO3's retry and failure listeners.
 
 ## Image variants
 
