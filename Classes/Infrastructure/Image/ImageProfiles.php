@@ -13,9 +13,9 @@ namespace Koh\Typo3Async\Infrastructure\Image;
  * again by a template asking for {"width":640} and by nothing else -- not by
  * the same width with a null maxHeight beside it, not by the same keys in
  * another order. (Integer strings are the one thing TYPO3 normalises: "640"
- * and 640 meet.) So the profiles are copied from what the site really
- * requested, which the command koh-async:image-profiles:suggest reads out of
- * sys_file_processedfile, keys in their stored order.
+ * and 640 meet.) So profiles are not designed, they are taken from what the
+ * site really requested: learned from sys_file_processedfile by default
+ * (LearnedImageProfiles), or listed by hand.
  *
  * Two kinds of profile, told apart by `crop`:
  *
@@ -29,33 +29,59 @@ namespace Koh\Typo3Async\Infrastructure\Image;
  *       handler replaces it, in place, with the absolute crop area, as Fluid's
  *       ImageViewHelper builds it.
  *
- * Configured as a list -- PHP array or JSON string -- in
- * $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['koh_async']['imageProfiles'],
- * typically from config/system/additional.php. Empty or invalid means off:
- * nothing is queued. There is deliberately no ext_conf_template.txt, see
- * ExtensionLayoutTest.
+ * Two settings under $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['koh_async'],
+ * typically from config/system/additional.php:
+ *
+ *   learnImageProfiles  percent of the originals a configuration must have
+ *                       been used for to be learned; default 10, 0 = off
+ *   imageProfiles       a list -- PHP array or JSON string -- produced in
+ *                       addition to the learned ones; default empty
+ *
+ * There is deliberately no ext_conf_template.txt, see ExtensionLayoutTest.
  */
 final class ImageProfiles
 {
+    public const DEFAULT_LEARN_PERCENT = 10;
+
     /**
      * @param list<array<string, mixed>> $profiles
      */
-    public function __construct(private readonly array $profiles) {}
+    public function __construct(
+        private readonly array $profiles,
+        private readonly float $learnShare = 0.0,
+    ) {}
 
-    public static function fromConfiguration(mixed $raw): self
+    public static function fromConfiguration(mixed $raw, mixed $learnPercent = 0): self
+    {
+        return new self(self::listed($raw), self::share($learnPercent));
+    }
+
+    private static function share(mixed $percent): float
+    {
+        if (!is_numeric($percent)) {
+            return self::DEFAULT_LEARN_PERCENT / 100;
+        }
+
+        return max(0.0, min(100.0, (float) $percent)) / 100;
+    }
+
+    /**
+     * @return list<array<string, mixed>>
+     */
+    private static function listed(mixed $raw): array
     {
         if (\is_string($raw)) {
             if ('' === trim($raw)) {
-                return new self([]);
+                return [];
             }
             try {
                 $raw = json_decode($raw, true, 8, \JSON_THROW_ON_ERROR);
             } catch (\JsonException) {
-                return new self([]);
+                return [];
             }
         }
         if (!\is_array($raw) || !array_is_list($raw)) {
-            return new self([]);
+            return [];
         }
         $profiles = [];
         foreach ($raw as $profile) {
@@ -68,12 +94,54 @@ final class ImageProfiles
             $profiles[] = $profile;
         }
 
-        return new self($profiles);
+        return $profiles;
     }
 
     public static function fromGlobals(): self
     {
-        return self::fromConfiguration($GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['koh_async']['imageProfiles'] ?? '');
+        $settings = $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['koh_async'] ?? [];
+
+        return self::fromConfiguration(
+            $settings['imageProfiles'] ?? '',
+            $settings['learnImageProfiles'] ?? self::DEFAULT_LEARN_PERCENT,
+        );
+    }
+
+    public function learnShare(): float
+    {
+        return $this->learnShare;
+    }
+
+    public function learns(): bool
+    {
+        return $this->learnShare > 0.0;
+    }
+
+    /** Whether an upload is worth a message at all. Decided without a database read. */
+    public function queuesFiles(): bool
+    {
+        return $this->learns() || [] !== $this->forFiles();
+    }
+
+    /** Whether a saved crop is worth a message at all. Decided without a database read. */
+    public function queuesReferences(): bool
+    {
+        return $this->learns() || $this->hasReferenceProfiles();
+    }
+
+    /**
+     * The listed profiles plus the learned ones, each once.
+     *
+     * @param list<array<string, mixed>> $learned
+     */
+    public function withLearned(array $learned): self
+    {
+        $merged = [];
+        foreach ([...$this->profiles, ...$learned] as $profile) {
+            $merged[(string) json_encode($profile)] = $profile;
+        }
+
+        return new self(array_values($merged), $this->learnShare);
     }
 
     public function isEmpty(): bool

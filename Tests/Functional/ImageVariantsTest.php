@@ -8,7 +8,6 @@ use Koh\Typo3Async\Domain\AsyncMode;
 use Koh\Typo3Async\Infrastructure\Image\PregenerateImageVariants;
 use Koh\Typo3Async\Infrastructure\Image\QueueCroppedReferences;
 use PHPUnit\Framework\Attributes\Test;
-use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\Messenger\MessageBusInterface;
 use TYPO3\CMS\Core\Console\CommandRegistry;
@@ -51,6 +50,8 @@ final class ImageVariantsTest extends FunctionalTestCase
             'EXTENSIONS' => [
                 'koh_async' => [
                     'imageProfiles' => json_encode([self::FILE_PROFILE, self::REFERENCE_PROFILE]),
+                    // Listed profiles only: LearnedProfilesTest covers learning.
+                    'learnImageProfiles' => 0,
                 ],
             ],
         ];
@@ -207,19 +208,5 @@ final class ImageVariantsTest extends FunctionalTestCase
 
         self::assertSame([], $this->rows('sys_messenger_messages'), 'handled, neither retried nor parked');
         self::assertSame([], $this->rows('sys_file_processedfile'));
-    }
-
-    #[Test]
-    public function theSuggestedProfileIsTheOneTheFrontendRequested(): void
-    {
-        $file = $this->upload();
-        $this->get(ImageService::class)->applyProcessingInstructions($file, self::FILE_PROFILE);
-
-        $suggest = new CommandTester($this->get(CommandRegistry::class)->get('koh-async:image-profiles:suggest'));
-        $suggest->execute(['--min-count' => '1'], ['verbosity' => OutputInterface::VERBOSITY_VERBOSE]);
-
-        $lines = explode("\n", rtrim($suggest->getDisplay()));
-        self::assertSame([self::FILE_PROFILE], json_decode((string) end($lines), true));
-        self::assertStringStartsWith('     1  {"width":64', $lines[0]);
     }
 }
