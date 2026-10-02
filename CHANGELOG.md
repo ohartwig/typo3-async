@@ -1,1 +1,12 @@
 # Changelog
+
+## [1.0.0] (2026-10-02)
+
+### :sparkles: Features
+
+* mails leave the request, with retries and a failure queue ([03ae49f](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-async/commit/03ae49fc60b4aeef6432c3da469d724c7572e93f))
+
+### :barber: Styles
+
+* **tests:** PER coding style in the functional test ([1e321b1](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-async/commit/1e321b1020b05b2fb0300327b8dc4febdbc116d0))
+
