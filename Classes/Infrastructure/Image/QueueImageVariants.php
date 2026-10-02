@@ -42,7 +42,7 @@ final class QueueImageVariants
 
     public function queueFile(FileInterface $file): void
     {
-        if (!$this->mode->isEnabled() || [] === $this->profiles->forFiles()) {
+        if (!$this->mode->isEnabled() || !$this->profiles->queuesFiles()) {
             return;
         }
         if (!$file instanceof File || !$file->isType(FileType::IMAGE)) {
@@ -53,7 +53,7 @@ final class QueueImageVariants
 
     public function queueReference(int $uid): void
     {
-        if (!$this->mode->isEnabled() || !$this->profiles->hasReferenceProfiles() || $uid <= 0) {
+        if (!$this->mode->isEnabled() || !$this->profiles->queuesReferences() || $uid <= 0) {
             return;
         }
         $this->bus->dispatch(PregenerateImageVariants::forReference($uid));

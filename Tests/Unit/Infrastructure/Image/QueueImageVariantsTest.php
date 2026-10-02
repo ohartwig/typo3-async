@@ -27,6 +27,16 @@ final class QueueImageVariantsTest extends TestCase
     }
 
     #[Test]
+    public function learningQueuesACropWithoutAnyListedProfile(): void
+    {
+        $bus = new RecordingBus();
+
+        new QueueImageVariants($bus, new AsyncMode(true), ImageProfiles::fromConfiguration('', 10))->queueReference(7);
+
+        self::assertCount(1, $bus->dispatched, 'which profiles apply is decided in the consumer');
+    }
+
+    #[Test]
     public function nothingIsQueuedWithoutAConsumerOrWithoutAMatchingProfile(): void
     {
         foreach ([
