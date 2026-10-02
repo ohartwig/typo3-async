@@ -26,11 +26,11 @@
     "homepage": "https://ole-hartwig.eu/open-source",
     "require": {
         "php": "^8.5.11",
-        "psr/container": "^2.0",
-        "psr/log": "^3.0",
-        "symfony/doctrine-messenger": "^7.4",
+        "psr/container": "^2.0.2",
+        "psr/log": "^3.0.2",
+        "symfony/doctrine-messenger": "^7.4.20",
         "symfony/mailer": "^7.4",
-        "symfony/messenger": "^7.4",
+        "symfony/messenger": "^7.4.20",
         "symfony/mime": "^7.4",
         "typo3/cms-core": "^14.3"
     },
@@ -41,7 +41,7 @@
         "phpstan/phpstan-deprecation-rules": "^2.0.5",
         "phpunit/phpunit": "^13.3.6",
         "typo3/testing-framework": "^9.7.0",
-        "symfony/dependency-injection": "^7.4"
+        "symfony/dependency-injection": "^7.4.20"
     },
     "repositories": [
         {
