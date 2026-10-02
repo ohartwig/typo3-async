@@ -1,0 +1,25 @@
+# Level and rule set come from the shared standard in moselwal/dev, so a change
+# there reaches this repository. Only the paths and the deviations below are
+# local — the shared file deliberately omits paths, because a relative path in
+# it would resolve inside vendor/.
+#
+# phpstan/phpstan-deprecation-rules is required by this package rather than by
+# moselwal/dev, which does not carry it; it is registered through
+# phpstan/extension-installer like the rest. We want every consumer of a
+# deprecated 3rd-party API flagged at QA time.
+includes:
+    - vendor/koh/dev-typo3/config/typo3/phpstan.neon
+    # Der Paketpfad, nicht phar://vendor/…/phpstan.phar/conf/bleedingEdge.neon.
+    # Beide zeigen auf dieselbe Datei, aber die phar-Form zwingt den
+    # Konfigurationslader ueber eine phar-Grenze fuer etwas, das entpackt
+    # danebenliegt — und in diesem CI-Image ruft PHPStan sich dabei erneut auf,
+    # was dort die Argumentliste zerlegt.
+    - vendor/phpstan/phpstan/conf/bleedingEdge.neon
+
+parameters:
+    paths:
+        - Classes
+        - Tests
+    treatPhpDocTypesAsCertain: false
+    reportUnmatchedIgnoredErrors: true
+    tmpDir: .phpstan.cache
