@@ -40,7 +40,9 @@ on each one names the exception.
 
 ## Image variants
 
-Off until `imageProfiles` is set (extension configuration, a JSON list). Each
+Off until `imageProfiles` is set, as a PHP array or a JSON string, in
+`config/system/additional.php`:
+`$GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['koh_async']['imageProfiles']`. Each
 entry is one processing instruction array, and it must be the array the
 template builds, key for key and in the same order: TYPO3 finds a processed
 file again by a checksum over that array, so `{"width":640}` and
