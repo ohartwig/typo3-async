@@ -5,9 +5,12 @@ declare(strict_types=1);
 namespace Koh\Typo3Async\Tests\Functional;
 
 use Koh\Typo3Async\Domain\AsyncMode;
+use Koh\Typo3Async\Infrastructure\Image\PregenerateImageVariants;
 use Koh\Typo3Async\Infrastructure\Image\QueueCroppedReferences;
 use PHPUnit\Framework\Attributes\Test;
+use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Tester\CommandTester;
+use Symfony\Component\Messenger\MessageBusInterface;
 use TYPO3\CMS\Core\Console\CommandRegistry;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\DataHandling\DataHandler;
@@ -61,14 +64,14 @@ final class ImageVariantsTest extends FunctionalTestCase
         parent::tearDown();
     }
 
-    private function upload(): File
+    private function upload(string $name = 'logo.svg', string $content = ''): File
     {
-        $source = tempnam(sys_get_temp_dir(), 'koh-async');
-        copy(__DIR__ . '/Fixtures/logo.svg', $source);
+        $source = (string) tempnam(sys_get_temp_dir(), 'koh-async');
+        '' === $content ? copy(__DIR__ . '/Fixtures/logo.svg', $source) : file_put_contents($source, $content);
         $storage = $this->get(StorageRepository::class)->getDefaultStorage();
         self::assertNotNull($storage);
         $storage->setEvaluatePermissions(false);
-        $file = $storage->addFile($source, $storage->getRootLevelFolder(), 'logo.svg');
+        $file = $storage->addFile($source, $storage->getRootLevelFolder(), $name);
         self::assertInstanceOf(File::class, $file);
 
         return $file;
@@ -153,5 +156,70 @@ final class ImageVariantsTest extends FunctionalTestCase
         $hook->processDatamap_afterDatabaseOperations('update', 'tt_content', 1, ['crop' => 'x'], GeneralUtility::makeInstance(DataHandler::class));
 
         self::assertSame([], $this->rows('sys_messenger_messages', ['queue_name' => 'images']));
+    }
+
+    #[Test]
+    public function aReplacedImageIsQueuedAgainAndAnUploadedTextIsNot(): void
+    {
+        $file = $this->upload();
+        $this->consume();
+
+        $replacement = (string) tempnam(sys_get_temp_dir(), 'koh-async');
+        copy(__DIR__ . '/Fixtures/logo.svg', $replacement);
+        $file->getStorage()->replaceFile($file, $replacement);
+        $this->upload('notes.txt', 'not an image');
+
+        self::assertCount(1, $this->rows('sys_messenger_messages', ['queue_name' => 'images']), 'the replace, not the text');
+    }
+
+    #[Test]
+    public function aNewReferenceResolvesItsIdThroughTheDataHandler(): void
+    {
+        $dataHandler = GeneralUtility::makeInstance(DataHandler::class);
+        $dataHandler->substNEWwithIDs['NEW1'] = 42;
+
+        $this->get(QueueCroppedReferences::class)->processDatamap_afterDatabaseOperations('new', 'sys_file_reference', 'NEW1', ['crop' => '{}'], $dataHandler);
+
+        self::assertCount(1, $this->rows('sys_messenger_messages', ['queue_name' => 'images']));
+    }
+
+    #[Test]
+    public function aRecordGoneOrMissingBeforeTheConsumerRunsIsNoFailure(): void
+    {
+        $file = $this->upload();
+        $this->get(ConnectionPool::class)->getConnectionForTable('sys_file')
+            ->update('sys_file', ['missing' => 1], ['uid' => $file->getUid()]);
+        // The consumer is another process and reads the row; here the
+        // ResourceFactory still holds the uploaded object.
+        $file->setMissing(true);
+        $connection = $this->get(ConnectionPool::class)->getConnectionForTable('sys_file_reference');
+        $connection->insert('sys_file_reference', [
+            'pid' => 0, 'uid_local' => $file->getUid(), 'uid_foreign' => 1, 'tablenames' => 'tt_content', 'fieldname' => 'image', 'crop' => '',
+        ]);
+        $missingReference = (int) $connection->lastInsertId();
+        $bus = $this->get(MessageBusInterface::class);
+        $bus->dispatch(PregenerateImageVariants::forFile(9999));
+        $bus->dispatch(PregenerateImageVariants::forReference(9999));
+        $bus->dispatch(PregenerateImageVariants::forReference($missingReference));
+
+        $consume = new CommandTester($this->get(CommandRegistry::class)->get('messenger:consume'));
+        $consume->execute(['receivers' => ['koh_async_images'], '--limit' => 4, '--time-limit' => 10]);
+
+        self::assertSame([], $this->rows('sys_messenger_messages'), 'handled, neither retried nor parked');
+        self::assertSame([], $this->rows('sys_file_processedfile'));
+    }
+
+    #[Test]
+    public function theSuggestedProfileIsTheOneTheFrontendRequested(): void
+    {
+        $file = $this->upload();
+        $this->get(ImageService::class)->applyProcessingInstructions($file, self::FILE_PROFILE);
+
+        $suggest = new CommandTester($this->get(CommandRegistry::class)->get('koh-async:image-profiles:suggest'));
+        $suggest->execute(['--min-count' => '1'], ['verbosity' => OutputInterface::VERBOSITY_VERBOSE]);
+
+        $lines = explode("\n", rtrim($suggest->getDisplay()));
+        self::assertSame([self::FILE_PROFILE], json_decode((string) end($lines), true));
+        self::assertStringStartsWith('     1  {"width":64', $lines[0]);
     }
 }
