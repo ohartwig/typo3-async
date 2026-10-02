@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.1.0](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-async/compare/v1.0.2...v1.1.0) (2026-10-02)
+
+### :sparkles: Features
+
+* produce image variants after an upload or a crop change ([c78ea75](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-async/commit/c78ea75ee3c8b26784b38600f1feb3210116aec5))
+
+### :white_check_mark: Tests
+
+* cover replace, NEW ids, gone records and the suggest command ([d5f55a2](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-async/commit/d5f55a2c0387478f6d8fb41a69280c4d69fe9bc6))
+
 ## [1.0.2](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-async/compare/v1.0.1...v1.0.2) (2026-10-02)
 
 ### :bug: Fixes
