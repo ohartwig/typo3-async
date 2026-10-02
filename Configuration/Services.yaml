@@ -116,3 +116,39 @@ services:
   Koh\Typo3Async\Infrastructure\Image\PregenerateImageVariantsHandler:
     tags:
       - name: 'messenger.message_handler'
+
+  # Inspecting and dropping parked messages: Symfony's own commands, which
+  # TYPO3 does not register. Retrying is koh-async:failed:retry instead of
+  # messenger:failed:retry (see that class for why).
+  koh_async.command.failed_show:
+    class: Symfony\Component\Messenger\Command\FailedMessagesShowCommand
+    autoconfigure: false
+    arguments:
+      $globalFailureReceiverName: 'koh_async_failed'
+      $failureTransports: !service_locator
+        koh_async_failed: '@koh_async.transport.failed'
+    tags:
+      - name: 'console.command'
+        command: 'messenger:failed:show'
+        description: 'Show one or more messages from the failure transport'
+        schedulable: false
+
+  koh_async.command.failed_remove:
+    class: Symfony\Component\Messenger\Command\FailedMessagesRemoveCommand
+    autoconfigure: false
+    arguments:
+      $globalFailureReceiverName: 'koh_async_failed'
+      $failureTransports: !service_locator
+        koh_async_failed: '@koh_async.transport.failed'
+    tags:
+      - name: 'console.command'
+        command: 'messenger:failed:remove'
+        description: 'Remove given messages from the failure transport'
+        schedulable: false
+
+  Koh\Typo3Async\Presentation\Command\RetryParkedMessagesCommand:
+    arguments:
+      $failed: '@koh_async.transport.failed'
+      $senders: !service_locator
+        koh_async_mail: '@koh_async.transport.mail'
+        koh_async_images: '@koh_async.transport.images'
