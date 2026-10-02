@@ -7,11 +7,13 @@
 # being split between this file and the project configuration.
 #
 #   koh_async_mail    queue `mail`: rendered mails waiting for the SMTP server
+#   koh_async_images  queue `images`: image variants to produce after an upload
 #   koh_async_failed  queue `failed`: messages that used up their retries
 #
-# A message routed here is only ever read by `messenger:consume koh_async_mail`.
-# ext_localconf.php routes to it only when MESSENGER_ASYNC=1, which the
-# platform sets together with that consumer.
+# A message routed here is only ever read by
+# `messenger:consume koh_async_mail koh_async_images`. ext_localconf.php routes
+# to them only when MESSENGER_ASYNC=1, which the platform sets together with
+# that consumer.
 services:
   _defaults:
     autowire: true
@@ -35,6 +37,18 @@ services:
         identifier: 'koh_async_mail'
       - name: 'messenger.receiver'
         identifier: 'koh_async_mail'
+
+  koh_async.transport.images:
+    class: Symfony\Component\Messenger\Bridge\Doctrine\Transport\DoctrineTransport
+    factory: ['@TYPO3\CMS\Core\Messenger\DoctrineTransportFactory', 'createTransport']
+    arguments:
+      $options:
+        queue_name: 'images'
+    tags:
+      - name: 'messenger.sender'
+        identifier: 'koh_async_images'
+      - name: 'messenger.receiver'
+        identifier: 'koh_async_images'
 
   koh_async.transport.failed:
     class: Symfony\Component\Messenger\Bridge\Doctrine\Transport\DoctrineTransport
@@ -62,13 +76,16 @@ services:
     arguments:
       $sendersLocator: !service_locator
         koh_async_mail: '@koh_async.transport.mail'
+        koh_async_images: '@koh_async.transport.images'
       $retryStrategyLocator: !service_locator
         koh_async_mail: '@koh_async.retry.mail'
+        koh_async_images: '@koh_async.retry.mail'
 
   Koh\Typo3Async\Infrastructure\Messenger\ParkFailedMessage:
     arguments:
       $failureSenders: !service_locator
         koh_async_mail: '@koh_async.transport.failed'
+        koh_async_images: '@koh_async.transport.failed'
 
   # The decorator sits in front of every consumer of TYPO3's MailerInterface.
   Koh\Typo3Async\Infrastructure\Mail\AsyncMailer:
@@ -82,5 +99,20 @@ services:
   Koh\Typo3Async\Infrastructure\Mail\SendEmailHandler:
     arguments:
       $mailer: '@Koh\Typo3Async\Infrastructure\Mail\AsyncMailer.inner'
+    tags:
+      - name: 'messenger.message_handler'
+
+  Koh\Typo3Async\Infrastructure\Image\ImageProfiles:
+    factory: ['Koh\Typo3Async\Infrastructure\Image\ImageProfiles', 'fromGlobals']
+
+  Koh\Typo3Async\Infrastructure\Image\QueueImageVariants:
+    arguments:
+      $bus: '@messenger.bus.default'
+
+  # Instantiated by the DataHandler through GeneralUtility::makeInstance.
+  Koh\Typo3Async\Infrastructure\Image\QueueCroppedReferences:
+    public: true
+
+  Koh\Typo3Async\Infrastructure\Image\PregenerateImageVariantsHandler:
     tags:
       - name: 'messenger.message_handler'
