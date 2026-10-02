@@ -75,7 +75,7 @@ final class AsyncMailTest extends FunctionalTestCase
     public function aMailIsQueuedAndTheConsumerDeliversIt(): void
     {
         $this->get(MailerInterface::class)->send(
-            (new Email())->from('shop@example.org')->to('customer@example.org')->subject('Order received')->text('Thank you.')
+            new Email()->from('shop@example.org')->to('customer@example.org')->subject('Order received')->text('Thank you.')
         );
 
         self::assertCount(1, $this->queued('mail'), 'queued in `mail`');
