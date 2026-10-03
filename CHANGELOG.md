@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.3.1](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-async/compare/v1.3.0...v1.3.1) (2026-10-03)
+
+### :repeat: Chores
+
+* **deps:** update dependency phpunit/phpunit to ^13.4.0 ([5d4702f](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-async/commit/5d4702ffdc70eb012d574554a709e8931455526f))
+
 ## [1.3.0](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-async/compare/v1.2.1...v1.3.0) (2026-10-02)
 
 ### :sparkles: Features
