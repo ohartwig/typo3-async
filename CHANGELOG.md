@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.3.2](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-async/compare/v1.3.1...v1.3.2) (2026-10-04)
+
+### :repeat: Chores
+
+* **repo-templates:** sync ([f60bf78](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-async/commit/f60bf7861b03f6ea6ebbbc2970deeb3a1d640931))
+
 ## [1.3.1](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-async/compare/v1.3.0...v1.3.1) (2026-10-03)
 
 ### :repeat: Chores
