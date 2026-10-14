@@ -30,7 +30,7 @@
         "psr/log": "^3.0.2",
         "symfony/doctrine-messenger": "^7.4.21",
         "symfony/mailer": "^7.4.19",
-        "symfony/messenger": "^7.4.20",
+        "symfony/messenger": "^7.4.21",
         "symfony/mime": "^7.4.19",
         "typo3/cms-core": "^14.3"
     },
@@ -41,7 +41,7 @@
         "phpstan/phpstan-deprecation-rules": "^2.0.5",
         "phpunit/phpunit": "^13.4.2",
         "typo3/testing-framework": "^9.7.0",
-        "symfony/dependency-injection": "^7.4.20"
+        "symfony/dependency-injection": "^7.4.21"
     },
     "repositories": [
         {
