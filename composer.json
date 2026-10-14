@@ -28,7 +28,7 @@
         "php": "^8.5.11",
         "psr/container": "^2.0.2",
         "psr/log": "^3.0.2",
-        "symfony/doctrine-messenger": "^7.4.20",
+        "symfony/doctrine-messenger": "^7.4.21",
         "symfony/mailer": "^7.4.19",
         "symfony/messenger": "^7.4.20",
         "symfony/mime": "^7.4.19",
