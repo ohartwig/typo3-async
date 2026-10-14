@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.3.5](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-async/compare/v1.3.4...v1.3.5) (2026-10-14)
+
+### :bug: Fixes
+
+* **deps:** update dependency symfony/doctrine-messenger to ^7.4.21 ([3956626](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-async/commit/3956626091d85ce63502f46b1572ef1b26c8020c))
+
 ## [1.3.4](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-async/compare/v1.3.3...v1.3.4) (2026-10-13)
 
 ### :repeat: Chores
