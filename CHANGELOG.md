@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.3.9](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-async/compare/v1.3.8...v1.3.9) (2026-10-16)
+
+### :bug: Fixes
+
+* **images:** queue variants only for an editor's upload within a pixel limit ([c60ade9](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-async/commit/c60ade9670910f74de01efdd8e2adb462d191581))
+
 ## [1.3.8](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-async/compare/v1.3.7...v1.3.8) (2026-10-16)
 
 ### :bug: Fixes
