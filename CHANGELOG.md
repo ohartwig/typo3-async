@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.3.8](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-async/compare/v1.3.7...v1.3.8) (2026-10-16)
+
+### :bug: Fixes
+
+* **commands:** keep the own commands off the scheduler ([b889853](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-async/commit/b889853121c3ff9405b44b5198c3d6e01b4ebcfb))
+
 ## [1.3.7](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-async/compare/v1.3.6...v1.3.7) (2026-10-16)
 
 ### :repeat: Continuous Integrations
