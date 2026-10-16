@@ -89,8 +89,41 @@ $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['koh_async']['imageProfiles'] = [
 ];
 ```
 
+Not every upload is queued. An image is worth the consumer's time when a
+template will render it, which is what an editor's upload is for; a frontend
+form that saves into FAL fires the same event, and producing every learned
+size of a stranger's image would be work nobody asked for -- on the worker
+that also delivers the mail. So, by default:
+
+- only uploads made from the backend, or by an authenticated backend user
+  (the DataHandler, a CLI import), are queued;
+- an image larger than 50 megapixels is left to the first view and logged.
+
+```php
+// queue uploads made outside the backend too; default false
+$GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['koh_async']['queueFrontendUploads'] = true;
+// largest source image still queued, in megapixels; default 50, 0 = no limit
+$GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['koh_async']['maxUploadMegapixels'] = 50;
+```
+
 The consumer must read `koh_async_images` (see Running it) -- otherwise the
 messages wait in the queue.
+
+### Run the images queue on its own consumer
+
+One worker reading both queues handles a message to its end before it polls
+again: a slow or failing image holds the mail behind it through three retries
+and their delays. Where image work is more than occasional, give each queue
+its own consumer:
+
+```bash
+MESSENGER_ASYNC=1 vendor/bin/typo3 messenger:consume koh_async_mail --time-limit=3600 --memory-limit=256M
+MESSENGER_ASYNC=1 vendor/bin/typo3 messenger:consume koh_async_images --time-limit=3600 --memory-limit=512M
+```
+
+Both write the queue figures (see below); on a platform that runs the
+consumer as a deployment, that is a second deployment or a second container
+with the second receiver name.
 
 ## Queue figures for monitoring
 

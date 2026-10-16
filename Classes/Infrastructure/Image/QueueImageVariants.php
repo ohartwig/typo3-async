@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Koh\Typo3Async\Infrastructure\Image;
 
 use Koh\Typo3Async\Domain\AsyncMode;
+use Koh\Typo3Async\Domain\UploadContext;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
 use TYPO3\CMS\Core\Attribute\AsEventListener;
 use TYPO3\CMS\Core\Resource\Event\AfterFileAddedEvent;
@@ -19,6 +21,11 @@ use TYPO3\CMS\Core\Resource\FileType;
  * Only in async mode, and never by processing in place: producing ten
  * variants inside the upload request would make the editor wait for exactly
  * the work this exists to move out of the request.
+ *
+ * And only for uploads the UploadPolicy admits: an editor's, within the pixel
+ * limit. A frontend form saving into FAL fires the same event, and an image
+ * nobody will render is not worth ImageMagick time on the consumer that also
+ * delivers the mail.
  */
 final class QueueImageVariants
 {
@@ -26,6 +33,9 @@ final class QueueImageVariants
         private readonly MessageBusInterface $bus,
         private readonly AsyncMode $mode,
         private readonly ImageProfiles $profiles,
+        private readonly UploadPolicy $policy,
+        private readonly UploadContext $context,
+        private readonly LoggerInterface $logger,
     ) {}
 
     #[AsEventListener(identifier: 'koh-async/queue-image-variants-added')]
@@ -46,6 +56,18 @@ final class QueueImageVariants
             return;
         }
         if (!$file instanceof File || !$file->isType(FileType::IMAGE)) {
+            return;
+        }
+        if (!$this->policy->allowsContext($this->context->isBackend())) {
+            return;
+        }
+        $width = (int) $file->getProperty('width');
+        $height = (int) $file->getProperty('height');
+        if (!$this->policy->allowsDimensions($width, $height)) {
+            $this->logger->warning('Variants of file {uid} not queued: {width} x {height} exceeds {max} megapixels', [
+                'uid' => $file->getUid(), 'width' => $width, 'height' => $height, 'max' => $this->policy->maxMegapixels(),
+            ]);
+
             return;
         }
         $this->bus->dispatch(PregenerateImageVariants::forFile($file->getUid()));

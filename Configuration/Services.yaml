@@ -105,6 +105,12 @@ services:
   Koh\Typo3Async\Infrastructure\Image\ImageProfiles:
     factory: ['Koh\Typo3Async\Infrastructure\Image\ImageProfiles', 'fromGlobals']
 
+  Koh\Typo3Async\Infrastructure\Image\UploadPolicy:
+    factory: ['Koh\Typo3Async\Infrastructure\Image\UploadPolicy', 'fromGlobals']
+
+  Koh\Typo3Async\Domain\UploadContext:
+    alias: Koh\Typo3Async\Infrastructure\Image\Typo3UploadContext
+
   Koh\Typo3Async\Infrastructure\Image\QueueImageVariants:
     arguments:
       $bus: '@messenger.bus.default'
