@@ -14,6 +14,11 @@
 # `messenger:consume koh_async_mail koh_async_images`. ext_localconf.php routes
 # to them only when MESSENGER_ASYNC=1, which the platform sets together with
 # that consumer.
+#
+# The transports come from a second instance of TYPO3's transport factory,
+# built with a serializer that decodes only the classes a message here is
+# made of (QueueClassAllowlist). TYPO3's own instance decodes every class,
+# which makes a row in sys_messenger_messages code execution in the consumer.
 services:
   _defaults:
     autowire: true
@@ -28,7 +33,7 @@ services:
 
   koh_async.transport.mail:
     class: Symfony\Component\Messenger\Bridge\Doctrine\Transport\DoctrineTransport
-    factory: ['@TYPO3\CMS\Core\Messenger\DoctrineTransportFactory', 'createTransport']
+    factory: ['@koh_async.transport_factory', 'createTransport']
     arguments:
       $options:
         queue_name: 'mail'
@@ -40,7 +45,7 @@ services:
 
   koh_async.transport.images:
     class: Symfony\Component\Messenger\Bridge\Doctrine\Transport\DoctrineTransport
-    factory: ['@TYPO3\CMS\Core\Messenger\DoctrineTransportFactory', 'createTransport']
+    factory: ['@koh_async.transport_factory', 'createTransport']
     arguments:
       $options:
         queue_name: 'images'
@@ -52,7 +57,7 @@ services:
 
   koh_async.transport.failed:
     class: Symfony\Component\Messenger\Bridge\Doctrine\Transport\DoctrineTransport
-    factory: ['@TYPO3\CMS\Core\Messenger\DoctrineTransportFactory', 'createTransport']
+    factory: ['@koh_async.transport_factory', 'createTransport']
     arguments:
       $options:
         queue_name: 'failed'
@@ -61,6 +66,16 @@ services:
         identifier: 'koh_async_failed'
       - name: 'messenger.receiver'
         identifier: 'koh_async_failed'
+
+  Koh\Typo3Async\Infrastructure\Messenger\QueueClassAllowlist:
+    factory: ['Koh\Typo3Async\Infrastructure\Messenger\QueueClassAllowlist', 'fromGlobals']
+
+  # TYPO3's factory, same connection and table, other serializer.
+  koh_async.transport_factory:
+    class: TYPO3\CMS\Core\Messenger\DoctrineTransportFactory
+    autoconfigure: false
+    arguments:
+      $serializer: '@Koh\Typo3Async\Infrastructure\Messenger\AllowlistedPhpSerializer'
 
   # Three retries, 30 s, 60 s and 120 s apart: long enough for a mail server
   # that restarts, short enough that a password-reset mail is not useless when
