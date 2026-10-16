@@ -9,6 +9,7 @@ use PHPUnit\Framework\Attributes\Test;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\Mailer\Messenger\SendEmailMessage;
 use Symfony\Component\Messenger\MessageBusInterface;
+use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
 use Symfony\Component\Messenger\Stamp\SentToFailureTransportStamp;
 use Symfony\Component\Messenger\Stamp\TransportNamesStamp;
 use Symfony\Component\Mime\Email;
@@ -39,12 +40,17 @@ final class ParkedMessagesTest extends FunctionalTestCase
         parent::tearDown();
     }
 
-    private function park(string $subject): void
+    private function park(string $subject, string $when = 'now'): void
     {
         $mail = new Email()->from('shop@example.org')->to('customer@example.org')->subject($subject)->text('.');
         $this->get(MessageBusInterface::class)->dispatch(
             new SendEmailMessage($mail),
-            [new TransportNamesStamp(['koh_async_failed']), new SentToFailureTransportStamp('koh_async_mail')],
+            [
+                new TransportNamesStamp(['koh_async_failed']),
+                new SentToFailureTransportStamp('koh_async_mail'),
+                // What the failure listener writes when it parks a message.
+                new RedeliveryStamp(0, new \DateTimeImmutable($when)),
+            ],
         );
     }
 
@@ -109,6 +115,22 @@ final class ParkedMessagesTest extends FunctionalTestCase
             self::assertTrue($registry->has($command), $command);
             self::assertNotContains($command, $schedulable, $command);
         }
+    }
+
+    #[Test]
+    public function parkedMessagesOlderThanTheRetentionArePruned(): void
+    {
+        $this->park('Password reset', '-15 days');
+        $this->park('Order received', '-1 day');
+        self::assertCount(2, $this->queued('failed'));
+
+        self::assertStringContainsString('1 parked message(s) older than 14 day(s) would be removed, 1 kept.', $this->command('koh-async:failed:prune', ['--dry-run' => true]));
+        self::assertCount(2, $this->queued('failed'), 'a dry run removes nothing');
+
+        self::assertStringContainsString('1 parked message(s) older than 14 day(s) removed, 1 kept.', $this->command('koh-async:failed:prune', []));
+        $left = $this->queued('failed');
+        self::assertCount(1, $left);
+        self::assertStringContainsString('Order received', (string) $left[0]['body']);
     }
 
     #[Test]
