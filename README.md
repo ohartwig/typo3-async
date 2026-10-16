@@ -144,6 +144,34 @@ Both write the queue figures (see below); on a platform that runs the
 consumer as a deployment, that is a second deployment or a second container
 with the second receiver name.
 
+## The queue is a trust boundary
+
+A queued message is a serialized PHP object in `sys_messenger_messages`, and
+the consumer turns it back into objects every second. TYPO3's own serializer
+allows every class when it does so; this extension's transports use one that
+decodes only the classes a message here is made of -- the two message types,
+Symfony's envelope and stamps, a mail with its parts and header dates, the
+flattened exception on a parked message. A row made of anything else is
+refused before any of its objects exists, with the class names in the error;
+the Doctrine transport removes the row and the consumer stops, which the
+platform answers with a restart.
+
+That is the boundary stated plainly: whoever can write that table can still
+make the consumer drop a row and restart, but no longer choose which classes
+it instantiates. A write to the database is a serious thing on any TYPO3
+site; before this extension it was not a code path into a worker process.
+
+A message of your own, routed to one of these transports, needs its class on
+the list:
+
+```php
+// further class-name prefixes a queued message may contain; default none
+$GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['koh_async']['messageClassPrefixes'] = ['Vendor\\Site\\Messenger\\'];
+```
+
+The wire format is unchanged, so messages queued before an update decode as
+before.
+
 ## Queue figures for monitoring
 
 Where `KOH_ASYNC_METRICS_FILE` names a file, the consumer writes the queue
