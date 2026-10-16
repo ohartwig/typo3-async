@@ -151,8 +151,11 @@ final class ParkedMessagesTest extends FunctionalTestCase
             'body' => $encoded['body'],
             'headers' => json_encode($encoded['headers'] ?? [], \JSON_THROW_ON_ERROR),
             'queue_name' => 'mail',
-            'created_at' => date('Y-m-d H:i:s'),
-            'available_at' => date('Y-m-d H:i:s'),
+            // The transport writes and compares these in UTC. A local-time
+            // stamp lands in the future wherever the server is east of it,
+            // and the row is then never available to the consumer.
+            'created_at' => gmdate('Y-m-d H:i:s', time() - 60),
+            'available_at' => gmdate('Y-m-d H:i:s', time() - 60),
         ]);
         self::assertCount(1, $this->queued('mail'));
 
