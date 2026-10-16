@@ -146,9 +146,27 @@ services:
         description: 'Remove given messages from the failure transport'
         schedulable: false
 
+  # Both own commands are registered here rather than through #[AsCommand]
+  # and autoconfigure, which would make them schedulable: a backend user with
+  # the scheduler module could then return every parked message to its queue
+  # on a timer, or run the learning query on one. Neither is scheduler work.
   Koh\Typo3Async\Presentation\Command\RetryParkedMessagesCommand:
+    autoconfigure: false
     arguments:
       $failed: '@koh_async.transport.failed'
       $senders: !service_locator
         koh_async_mail: '@koh_async.transport.mail'
         koh_async_images: '@koh_async.transport.images'
+    tags:
+      - name: 'console.command'
+        command: 'koh-async:failed:retry'
+        description: 'Return parked messages to the queue they came from.'
+        schedulable: false
+
+  Koh\Typo3Async\Presentation\Command\SuggestImageProfilesCommand:
+    autoconfigure: false
+    tags:
+      - name: 'console.command'
+        command: 'koh-async:image-profiles:suggest'
+        description: 'Show the image profiles learned from what this site has rendered.'
+        schedulable: false
