@@ -57,6 +57,10 @@ final class ImageVariantsTest extends FunctionalTestCase
         ];
         parent::setUp();
         $this->get(StorageRepository::class)->createLocalStorage('fileadmin', 'fileadmin/', 'relative', '', true);
+        // Uploads are an editor's unless a test says otherwise: without a
+        // backend user nothing is queued (UploadPolicy).
+        $this->importCSVDataSet(__DIR__ . '/Fixtures/be_users.csv');
+        $this->setUpBackendUser(1);
     }
 
     protected function tearDown(): void
@@ -129,8 +133,6 @@ final class ImageVariantsTest extends FunctionalTestCase
 
         // The editor saves the crop: a real DataHandler run, so the hook
         // registration in ext_localconf.php is part of what is tested.
-        $this->importCSVDataSet(__DIR__ . '/Fixtures/be_users.csv');
-        $this->setUpBackendUser(1);
         $dataHandler = GeneralUtility::makeInstance(DataHandler::class);
         $dataHandler->start(['sys_file_reference' => [$uid => ['crop' => $crop]]], []);
         $dataHandler->process_datamap();
@@ -147,6 +149,28 @@ final class ImageVariantsTest extends FunctionalTestCase
         $this->get(ImageService::class)->applyProcessingInstructions($reference, $instructions);
 
         self::assertCount(2, $this->rows('sys_file_processedfile'), 'the frontend found the cropped variant');
+    }
+
+    #[Test]
+    public function anUploadWithoutABackendUserQueuesNothing(): void
+    {
+        // A frontend form saving into FAL, or a script without a user: the
+        // same FAL event, but nobody asked for variants of this image.
+        unset($GLOBALS['BE_USER']);
+
+        $this->upload();
+
+        self::assertSame([], $this->rows('sys_messenger_messages', ['queue_name' => 'images']));
+    }
+
+    #[Test]
+    public function anImageOverThePixelLimitIsNotQueued(): void
+    {
+        // 9000 x 9000 = 81 megapixels, over the default of 50. TYPO3 reads an
+        // SVG's size from its attributes, as it reads a photo's from its header.
+        $this->upload('huge.svg', '<svg xmlns="http://www.w3.org/2000/svg" width="9000" height="9000"><rect width="9000" height="9000" fill="#c00"/></svg>');
+
+        self::assertSame([], $this->rows('sys_messenger_messages', ['queue_name' => 'images']));
     }
 
     #[Test]
