@@ -8,10 +8,13 @@ use Koh\Typo3Async\Domain\AsyncMode;
 use PHPUnit\Framework\Attributes\Test;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\Mailer\Messenger\SendEmailMessage;
+use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
 use Symfony\Component\Messenger\Stamp\SentToFailureTransportStamp;
 use Symfony\Component\Messenger\Stamp\TransportNamesStamp;
+use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
 use Symfony\Component\Mime\Email;
 use TYPO3\CMS\Core\Console\CommandRegistry;
 use TYPO3\CMS\Core\Database\ConnectionPool;
@@ -131,6 +134,37 @@ final class ParkedMessagesTest extends FunctionalTestCase
         $left = $this->queued('failed');
         self::assertCount(1, $left);
         self::assertStringContainsString('Order received', (string) $left[0]['body']);
+    }
+
+    /**
+     * A row nobody here wrote: an envelope around an object of a class no
+     * message of this extension contains. The consumer refuses it before any
+     * of its objects exists, the transport drops the row, and the worker
+     * stops with the exception -- it does not instantiate what it was told.
+     */
+    #[Test]
+    public function aQueueRowMadeOfForeignClassesIsRefusedAndDropped(): void
+    {
+        $envelope = new Envelope(new \ArrayObject(['not a message']));
+        $encoded = new PhpSerializer()->encode($envelope);
+        $this->get(ConnectionPool::class)->getConnectionForTable('sys_messenger_messages')->insert('sys_messenger_messages', [
+            'body' => $encoded['body'],
+            'headers' => json_encode($encoded['headers'] ?? [], \JSON_THROW_ON_ERROR),
+            'queue_name' => 'mail',
+            'created_at' => date('Y-m-d H:i:s'),
+            'available_at' => date('Y-m-d H:i:s'),
+        ]);
+        self::assertCount(1, $this->queued('mail'));
+
+        try {
+            $this->command('messenger:consume', ['receivers' => ['koh_async_mail'], '--limit' => 1, '--time-limit' => 5]);
+            self::fail('the consumer must not handle a row made of ArrayObject');
+        } catch (MessageDecodingFailedException $e) {
+            self::assertStringContainsString('ArrayObject', $e->getMessage());
+        }
+
+        self::assertSame([], $this->queued('mail'), 'the row is gone, not retried for ever');
+        self::assertSame([], $this->queued('failed'), 'and not parked either: there is no message to park');
     }
 
     #[Test]
