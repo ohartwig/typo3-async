@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.3.7](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-async/compare/v1.3.6...v1.3.7) (2026-10-16)
+
+### :repeat: Continuous Integrations
+
+* drop the TER publish, Packagist is enough ([80580dd](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-async/commit/80580dd735b26178bd37f5db06152726104c3ea8))
+* publish releases to the TYPO3 Extension Repository ([01832f7](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-async/commit/01832f7bad0f5a548340fcc41d62373078094419))
+
+### :repeat: Chores
+
+* **repo-templates:** sync ([a5c084c](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-async/commit/a5c084c57c7661dfe01cd48aa13b84d530978e9a))
+
 ## [1.3.6](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-async/compare/v1.3.5...v1.3.6) (2026-10-14)
 
 ### :bug: Fixes
