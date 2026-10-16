@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.4.0](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-async/compare/v1.3.9...v1.4.0) (2026-10-16)
+
+### :sparkles: Features
+
+* **failed:** prune parked messages after a retention ([4965533](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-async/commit/4965533c355cd6025ad71256eb27dc8b768497a6))
+
 ## [1.3.9](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-async/compare/v1.3.8...v1.3.9) (2026-10-16)
 
 ### :bug: Fixes
