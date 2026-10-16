@@ -152,10 +152,20 @@ services:
         description: 'Remove given messages from the failure transport'
         schedulable: false
 
-  # Both own commands are registered here rather than through #[AsCommand]
-  # and autoconfigure, which would make them schedulable: a backend user with
-  # the scheduler module could then return every parked message to its queue
-  # on a timer, or run the learning query on one. Neither is scheduler work.
+  Koh\Typo3Async\Infrastructure\Messenger\FailedRetention:
+    factory: ['Koh\Typo3Async\Infrastructure\Messenger\FailedRetention', 'fromGlobals']
+
+  # Scheduler work by design: the one own command that is meant to run on a
+  # timer, so it keeps the default (schedulable).
+  Koh\Typo3Async\Presentation\Command\PruneParkedMessagesCommand:
+    arguments:
+      $failed: '@koh_async.transport.failed'
+
+  # The other two own commands are registered here rather than through
+  # #[AsCommand] and autoconfigure, which would make them schedulable: a
+  # backend user with the scheduler module could then return every parked
+  # message to its queue on a timer, or run the learning query on one.
+  # Neither is scheduler work.
   Koh\Typo3Async\Presentation\Command\RetryParkedMessagesCommand:
     autoconfigure: false
     arguments:

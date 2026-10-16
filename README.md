@@ -47,6 +47,25 @@ message; the consumer then handles it with the usual retries. Symfony's
 `messenger:failed:retry` is deliberately not registered: it would handle the
 message outside TYPO3's retry and failure listeners.
 
+A parked message is the whole message: a mail with its recipients, body and
+attachments (a password-reset link, a form submitter's data), or an image
+job. It is readable to anyone with database access, and `messenger:failed:show
+-v` prints it. So parked messages are not kept for ever: `koh-async:failed:prune`
+removes those parked longer than the retention, 14 days by default, and is
+meant for the scheduler -- register it there (or run it from cron) on every
+installation with a consumer:
+
+```bash
+vendor/bin/typo3 koh-async:failed:prune             # older than failedRetentionDays
+vendor/bin/typo3 koh-async:failed:prune --dry-run   # count only
+vendor/bin/typo3 koh-async:failed:prune --days 3
+```
+
+```php
+// days a parked message is kept; default 14, 0 keeps everything
+$GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['koh_async']['failedRetentionDays'] = 14;
+```
+
 ## Image variants
 
 After an upload, a replace or a saved crop, the consumer produces the sizes
