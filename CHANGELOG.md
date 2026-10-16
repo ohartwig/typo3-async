@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.4.1](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-async/compare/v1.4.0...v1.4.1) (2026-10-16)
+
+### :bug: Fixes
+
+* **messenger:** decode only the classes a queued message is made of ([4eba9f8](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-async/commit/4eba9f8920f597255acd66ffbdc13ef50ae81ed2))
+
+### :white_check_mark: Tests
+
+* **functional:** stamp the hand-written queue row in UTC ([2a668bb](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-async/commit/2a668bb412cfc8f12e826694a553496020f7b86b))
+
 ## [1.4.0](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-async/compare/v1.3.9...v1.4.0) (2026-10-16)
 
 ### :sparkles: Features
