@@ -38,6 +38,9 @@ final class LearnedProfilesTest extends FunctionalTestCase
         putenv(AsyncMode::ENVIRONMENT_VARIABLE . '=1');
         parent::setUp();
         $this->get(StorageRepository::class)->createLocalStorage('fileadmin', 'fileadmin/', 'relative', '', true);
+        // Uploads are an editor's: without a backend user nothing is queued.
+        $this->importCSVDataSet(__DIR__ . '/Fixtures/be_users.csv');
+        $this->setUpBackendUser(1);
     }
 
     protected function tearDown(): void
