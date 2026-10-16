@@ -94,6 +94,23 @@ final class ParkedMessagesTest extends FunctionalTestCase
         self::assertSame([], $this->queued('failed'));
     }
 
+    /**
+     * Returning every parked message on a timer, or running the learning query
+     * on one, is not scheduler work: both commands stay off the scheduler's
+     * list, like messenger:failed:show and messenger:failed:remove.
+     */
+    #[Test]
+    public function theOwnCommandsAreRegisteredButNotSchedulable(): void
+    {
+        $registry = $this->get(CommandRegistry::class);
+        $schedulable = array_keys($registry->getSchedulableCommandsConfiguration());
+
+        foreach (['koh-async:failed:retry', 'koh-async:image-profiles:suggest'] as $command) {
+            self::assertTrue($registry->has($command), $command);
+            self::assertNotContains($command, $schedulable, $command);
+        }
+    }
+
     #[Test]
     public function retryWantsIdsOrAll(): void
     {
