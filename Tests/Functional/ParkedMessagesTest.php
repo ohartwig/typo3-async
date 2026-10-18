@@ -45,7 +45,7 @@ final class ParkedMessagesTest extends FunctionalTestCase
 
     private function park(string $subject, string $when = 'now'): void
     {
-        $mail = new Email()->from('shop@example.org')->to('customer@example.org')->subject($subject)->text('.');
+        $mail = (new Email())->from('shop@example.org')->to('customer@example.org')->subject($subject)->text('.');
         $this->get(MessageBusInterface::class)->dispatch(
             new SendEmailMessage($mail),
             [
@@ -146,7 +146,7 @@ final class ParkedMessagesTest extends FunctionalTestCase
     public function aQueueRowMadeOfForeignClassesIsRefusedAndDropped(): void
     {
         $envelope = new Envelope(new \ArrayObject(['not a message']));
-        $encoded = new PhpSerializer()->encode($envelope);
+        $encoded = (new PhpSerializer())->encode($envelope);
         $this->get(ConnectionPool::class)->getConnectionForTable('sys_messenger_messages')->insert('sys_messenger_messages', [
             'body' => $encoded['body'],
             'headers' => json_encode($encoded['headers'] ?? [], \JSON_THROW_ON_ERROR),

@@ -33,7 +33,7 @@ final class AllowlistedPhpSerializerTest extends TestCase
 
     private static function mail(): Envelope
     {
-        $email = new Email()
+        $email = (new Email())
             ->from(new Address('shop@example.org', 'Shop'))
             ->to('customer@example.org')
             ->cc('copy@example.org')
@@ -72,7 +72,7 @@ final class AllowlistedPhpSerializerTest extends TestCase
         $serializer = self::serializer();
         foreach ([
             new Envelope(PregenerateImageVariants::forFile(7)),
-            new Envelope(new SendEmailMessage(new MailMessage()->to('a@example.org')->subject('x')->text('.'))),
+            new Envelope(new SendEmailMessage((new MailMessage())->to('a@example.org')->subject('x')->text('.'))),
         ] as $envelope) {
             self::assertEquals($envelope, $serializer->decode($serializer->encode($envelope)));
         }
@@ -81,7 +81,7 @@ final class AllowlistedPhpSerializerTest extends TestCase
     #[Test]
     public function whatTypo3sSerializerQueuedBeforeStillDecodes(): void
     {
-        $queuedBefore = new PhpSerializer()->encode(self::mail());
+        $queuedBefore = (new PhpSerializer())->encode(self::mail());
 
         $decoded = self::serializer()->decode($queuedBefore);
 
@@ -92,7 +92,7 @@ final class AllowlistedPhpSerializerTest extends TestCase
     public function aRowMadeOfOtherClassesIsRefusedByNameBeforeAnyObjectExists(): void
     {
         $serializer = self::serializer();
-        $body = new PhpSerializer()->encode(new Envelope(new \ArrayObject(['x'])));
+        $body = (new PhpSerializer())->encode(new Envelope(new \ArrayObject(['x'])));
 
         try {
             $serializer->decode($body);
@@ -106,7 +106,7 @@ final class AllowlistedPhpSerializerTest extends TestCase
     public function aStrangerHiddenInsideAnAllowedObjectIsRefusedToo(): void
     {
         $serializer = self::serializer();
-        $body = new PhpSerializer()->encode(new Envelope(PregenerateImageVariants::forFile(1), [new DelayStamp(0)]));
+        $body = (new PhpSerializer())->encode(new Envelope(PregenerateImageVariants::forFile(1), [new DelayStamp(0)]));
         // The stamp array is where a hand-written row would hide a gadget:
         // the DelayStamp object is swapped for one of another class, the
         // array key naming the stamp class stays.
@@ -125,7 +125,7 @@ final class AllowlistedPhpSerializerTest extends TestCase
     public function aSitesOwnMessageClassCanBeAllowedByPrefix(): void
     {
         $envelope = new Envelope(new \ArrayObject(['x']));
-        $body = new PhpSerializer()->encode($envelope);
+        $body = (new PhpSerializer())->encode($envelope);
 
         self::assertEquals($envelope, self::serializer('ArrayObject')->decode($body), 'as a string');
         self::assertEquals($envelope, self::serializer(['\\ArrayObject'])->decode($body), 'as a list, leading backslash tolerated');

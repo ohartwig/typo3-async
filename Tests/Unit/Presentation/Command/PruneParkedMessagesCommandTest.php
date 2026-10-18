@@ -84,8 +84,8 @@ final class PruneParkedMessagesCommandTest extends TestCase
         self::assertSame(14, FailedRetention::fromConfiguration('soon')->days());
         self::assertSame(3, FailedRetention::fromConfiguration('3')->days());
         self::assertSame(0, FailedRetention::fromConfiguration(-2)->days());
-        self::assertNull(new FailedRetention(0)->cutoff(new \DateTimeImmutable()));
-        self::assertEquals(new \DateTimeImmutable('2026-10-02T12:00:00Z'), new FailedRetention(14)->cutoff(new \DateTimeImmutable('2026-10-16T12:00:00Z')));
+        self::assertNull((new FailedRetention(0))->cutoff(new \DateTimeImmutable()));
+        self::assertEquals(new \DateTimeImmutable('2026-10-02T12:00:00Z'), (new FailedRetention(14))->cutoff(new \DateTimeImmutable('2026-10-16T12:00:00Z')));
     }
 }
 

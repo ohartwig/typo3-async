@@ -195,7 +195,7 @@ php -S 0.0.0.0:9106 vendor/koh/typo3-async/Resources/Private/Php/serve-metrics.p
 
 ## Requirements
 
-TYPO3 14.3, PHP 8.5.
+TYPO3 14.3, PHP 8.3 or later.
 
 ## License
 
