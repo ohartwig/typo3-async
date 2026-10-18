@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.4.3](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-async/compare/v1.4.2...v1.4.3) (2026-10-18)
+
+### :bug: Fixes
+
+* admit PHP 8.3 and test the floor on it ([9e1227f](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-async/commit/9e1227fda65b7a8e3c91d79f6ad865f92d325a27))
+
 ## [1.4.2](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-async/compare/v1.4.1...v1.4.2) (2026-10-17)
 
 ### :repeat: Chores
