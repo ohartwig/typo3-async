@@ -116,7 +116,7 @@ final class QueueImageVariantsTest extends TestCase
     {
         $bus = new RecordingBus();
 
-        new QueueImageVariants($bus, new AsyncMode(true), ImageProfiles::fromConfiguration(self::REFERENCE_PROFILES), new UploadPolicy(), self::context(true), new NullLogger())->queueReference(7);
+        (new QueueImageVariants($bus, new AsyncMode(true), ImageProfiles::fromConfiguration(self::REFERENCE_PROFILES), new UploadPolicy(), self::context(true), new NullLogger()))->queueReference(7);
 
         self::assertEquals([PregenerateImageVariants::forReference(7)], $bus->dispatched);
     }
@@ -126,7 +126,7 @@ final class QueueImageVariantsTest extends TestCase
     {
         $bus = new RecordingBus();
 
-        new QueueImageVariants($bus, new AsyncMode(true), ImageProfiles::fromConfiguration('', 10), new UploadPolicy(), self::context(true), new NullLogger())->queueReference(7);
+        (new QueueImageVariants($bus, new AsyncMode(true), ImageProfiles::fromConfiguration('', 10), new UploadPolicy(), self::context(true), new NullLogger()))->queueReference(7);
 
         self::assertCount(1, $bus->dispatched, 'which profiles apply is decided in the consumer');
     }
@@ -142,7 +142,7 @@ final class QueueImageVariantsTest extends TestCase
         ] as $case => [$async, $profiles, $uid]) {
             $bus = new RecordingBus();
 
-            new QueueImageVariants($bus, new AsyncMode($async), ImageProfiles::fromConfiguration($profiles), new UploadPolicy(), self::context(true), new NullLogger())->queueReference($uid);
+            (new QueueImageVariants($bus, new AsyncMode($async), ImageProfiles::fromConfiguration($profiles), new UploadPolicy(), self::context(true), new NullLogger()))->queueReference($uid);
 
             self::assertSame([], $bus->dispatched, $case);
         }

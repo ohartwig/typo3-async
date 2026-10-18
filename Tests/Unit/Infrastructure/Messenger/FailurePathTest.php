@@ -42,7 +42,7 @@ final class FailurePathTest extends TestCase
         $record = new RecordFailureReason();
         $park = new ParkFailedMessage(new ServiceLocator(['koh_async_mail' => static fn() => $failed]), new NullLogger());
 
-        $envelope = new Envelope(new SendEmailMessage(new Email()->to('a@example.org')->text('x')), [new ReceivedStamp('koh_async_mail')]);
+        $envelope = new Envelope(new SendEmailMessage((new Email())->to('a@example.org')->text('x')), [new ReceivedStamp('koh_async_mail')]);
         $delays = [];
         for ($attempt = 1; $attempt <= 4; ++$attempt) {
             $event = new WorkerMessageFailedEvent($envelope, 'koh_async_mail', new \RuntimeException('SMTP down'));
