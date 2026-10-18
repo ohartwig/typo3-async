@@ -15,7 +15,7 @@ final class QueueableEmailTest extends TestCase
     #[Test]
     public function aPlainEmailPassesThroughUnchanged(): void
     {
-        $email = new Email()->to('a@example.org')->text('x');
+        $email = (new Email())->to('a@example.org')->text('x');
 
         self::assertSame($email, QueueableEmail::from($email));
     }

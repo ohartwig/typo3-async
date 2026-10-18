@@ -75,7 +75,7 @@ final class AsyncMailTest extends FunctionalTestCase
     public function aMailIsQueuedAndTheConsumerDeliversIt(): void
     {
         $this->get(MailerInterface::class)->send(
-            new Email()->from('shop@example.org')->to('customer@example.org')->subject('Order received')->text('Thank you.')
+            (new Email())->from('shop@example.org')->to('customer@example.org')->subject('Order received')->text('Thank you.')
         );
 
         self::assertCount(1, $this->queued('mail'), 'queued in `mail`');
@@ -96,7 +96,7 @@ final class AsyncMailTest extends FunctionalTestCase
         @unlink($file);
         putenv('KOH_ASYNC_METRICS_FILE=' . $file);
         $this->get(MailerInterface::class)->send(
-            new Email()->from('shop@example.org')->to('customer@example.org')->subject('Waiting')->text('.')
+            (new Email())->from('shop@example.org')->to('customer@example.org')->subject('Waiting')->text('.')
         );
 
         // An empty receiver list would block; one idle loop on `images` is

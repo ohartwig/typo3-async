@@ -40,7 +40,7 @@ final class ProfileLearnerTest extends TestCase
         $rows[] = self::row(9, ['width' => 12]);
         $rows[] = self::row(10, ['width' => 12]);
 
-        $learned = new ProfileLearner()->learn($rows, self::noVariants(), 0.1, 3);
+        $learned = (new ProfileLearner())->learn($rows, self::noVariants(), 0.1, 3);
 
         self::assertCount(1, $learned, 'width 12: two originals, under the minimum of three');
         self::assertSame($srcset, $learned[0]['profile']);
@@ -57,7 +57,7 @@ final class ProfileLearnerTest extends TestCase
             $rows[] = self::row($original, ['width' => 640]);
         }
 
-        $learned = new ProfileLearner()->learn($rows, self::noVariants(), 0.1, 3);
+        $learned = (new ProfileLearner())->learn($rows, self::noVariants(), 0.1, 3);
 
         self::assertSame([['width' => 640]], array_column($learned, 'profile'), '3 of 40 is 7.5 %');
     }
@@ -71,7 +71,7 @@ final class ProfileLearnerTest extends TestCase
         }
         $variantsOf = static fn(int $original, Area $area): array => 4 === $original ? [] : ['hero'];
 
-        $learned = new ProfileLearner()->learn($rows, $variantsOf, 0.1, 3);
+        $learned = (new ProfileLearner())->learn($rows, $variantsOf, 0.1, 3);
 
         self::assertSame([['width' => 960, 'crop' => 'hero', 'fileExtension' => 'webp']], array_column($learned, 'profile'));
         self::assertSame(3, $learned[0]['originals'], 'original 4: no variant produces the area any more');
@@ -85,7 +85,7 @@ final class ProfileLearnerTest extends TestCase
             $rows[] = self::row($original, ['width' => 320, 'crop' => new Area(0, 0, 100, 100)]);
         }
 
-        $learned = new ProfileLearner()->learn($rows, static fn(int $o, Area $a): array => ['sm', 'xs'], 0.1, 3);
+        $learned = (new ProfileLearner())->learn($rows, static fn(int $o, Area $a): array => ['sm', 'xs'], 0.1, 3);
 
         self::assertSame([['width' => 320, 'crop' => 'sm'], ['width' => 320, 'crop' => 'xs']], array_column($learned, 'profile'));
     }
@@ -101,6 +101,6 @@ final class ProfileLearnerTest extends TestCase
             self::row(4, ['nested' => ['x']]),
         ];
 
-        self::assertSame([], new ProfileLearner()->learn($rows, self::noVariants(), 0.0, 1));
+        self::assertSame([], (new ProfileLearner())->learn($rows, self::noVariants(), 0.0, 1));
     }
 }

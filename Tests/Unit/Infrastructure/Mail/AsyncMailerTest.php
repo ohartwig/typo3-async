@@ -36,7 +36,7 @@ final class AsyncMailerTest extends TestCase
 
     private function email(): Email
     {
-        return new Email()->from('shop@example.org')->to('customer@example.org')->subject('Hello')->text('Body');
+        return (new Email())->from('shop@example.org')->to('customer@example.org')->subject('Hello')->text('Body');
     }
 
     #[Test]
