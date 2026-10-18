@@ -18,7 +18,7 @@ final class SendEmailHandlerTest extends TestCase
     #[Test]
     public function itSendsTheQueuedMailThroughTheMailerItWasGiven(): void
     {
-        $email = new Email()->to('customer@example.org')->text('x');
+        $email = (new Email())->to('customer@example.org')->text('x');
         $envelope = new Envelope(new Address('bounce@example.org'), [new Address('customer@example.org')]);
         $mailer = $this->createMock(MailerInterface::class);
         $mailer->expects(self::once())->method('send')->with($email, $envelope);
@@ -35,7 +35,7 @@ final class SendEmailHandlerTest extends TestCase
         $mailer->method('send')->willThrowException(new \RuntimeException('SMTP down'));
 
         try {
-            (new SendEmailHandler($mailer))(new SendEmailMessage(new Email()->to('a@example.org')->text('x')));
+            (new SendEmailHandler($mailer))(new SendEmailMessage((new Email())->to('a@example.org')->text('x')));
             self::fail('the failure was swallowed');
         } catch (\RuntimeException $e) {
             self::assertSame('SMTP down', $e->getMessage());
