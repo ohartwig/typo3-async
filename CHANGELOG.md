@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.4.4](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-async/compare/v1.4.3...v1.4.4) (2026-10-29)
+
+### :bug: Fixes
+
+* **deps:** update dependency symfony/mime to ^7.4.22 [security] ([528223c](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-async/commit/528223cf7e15149117eccf67089b6e62f765b9c9))
+
+### :repeat: Chores
+
+* **repo-templates:** sync ([af9b957](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-async/commit/af9b95799805a095c10ceaae25a9b4c0078f6cc5))
+
 ## [1.4.3](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-async/compare/v1.4.2...v1.4.3) (2026-10-18)
 
 ### :bug: Fixes
