@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.4.7](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-async/compare/v1.4.6...v1.4.7) (2026-11-06)
+
+### :bug: Fixes
+
+* **deps:** update composer packages to ^7.4.23 ([46967a1](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-async/commit/46967a1f1394c57f6fc9e0e5a6d58f58682aff93))
+
+### :repeat: Chores
+
+* **repo-templates:** sync ([817eca6](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-async/commit/817eca63dbdcbf42de40ba481ad16e823f3f242a))
+* **repo-templates:** sync ([86278d1](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-async/commit/86278d1254287d4d2206b343ea537017c749d7fe))
+
 ## [1.4.6](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-async/compare/v1.4.5...v1.4.6) (2026-10-30)
 
 ### :repeat: Chores
