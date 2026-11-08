@@ -24,14 +24,20 @@ consumer exists.
 | `QueueImageVariants`, `QueueCroppedReferences` | An image uploaded or replaced, or a file reference saved with a crop, queues `PregenerateImageVariants` -- the uid only. |
 | `PregenerateImageVariantsHandler` | Runs in the consumer and produces the configured variants through `File::process()`, the call Fluid's `ImageViewHelper` ends in, so the page finds them ready. |
 | `koh_async_images` | Doctrine transport, queue `images`. |
-| `RecordFailureReason`, `RetryFailedMessage`, `ParkFailedMessage` | The failure path TYPO3 does not register on its own: the exception is recorded, the message retried three times (30 s, 60 s, 120 s, with jitter), then moved to `koh_async_failed` (queue `failed`) instead of being dropped. |
+| `koh_async_cache` | Doctrine transport, queue `cache`, for other extensions (see [Queueing work of your own](#queueing-work-of-your-own)). Nothing here routes to it. |
+| `RecordFailureReason`, `RetryFailedMessage`, `ParkFailedMessage` | The failure path TYPO3 does not register on its own: the exception is recorded, the message retried three times (30 s, 60 s, 120 s, with jitter), then moved to `koh_async_failed` (queue `failed`) instead of being dropped. `koh_async_cache` retries sooner: 5 s, 15 s, 45 s. |
 
 ## Running it
 
 ```bash
 # where the consumer runs, and only there
-MESSENGER_ASYNC=1 vendor/bin/typo3 messenger:consume koh_async_mail koh_async_images --time-limit=3600 --memory-limit=256M
+MESSENGER_ASYNC=1 vendor/bin/typo3 messenger:consume koh_async_mail koh_async_images koh_async_cache --time-limit=3600 --memory-limit=256M
 ```
+
+A consumer started with fewer receivers keeps working; it just does not read
+the queues it does not name. List `koh_async_cache` only from the release
+that ships it (the first after 1.4.8): `messenger:consume` refuses a receiver it does not know,
+and the consumer would not start.
 
 The web pods need `MESSENGER_ASYNC=1` too, or they keep sending in the
 request. Parked messages (failure queue, after three attempts):
@@ -144,6 +150,45 @@ Both write the queue figures (see below); on a platform that runs the
 consumer as a deployment, that is a second deployment or a second container
 with the second receiver name.
 
+## Queueing work of your own
+
+`koh_async_cache` (queue `cache`) is a transport for other extensions:
+short, idempotent work that should leave the editor's request, such as
+purging an edge cache after a save. This extension routes nothing to it.
+Retries come sooner than on the other queues (5 s, 15 s, 45 s), then the
+message is parked in `failed` like any other.
+
+Another extension routes a message there from its `ext_localconf.php`, under
+the same condition this extension routes its own -- a consumer reads the
+queue only where `MESSENGER_ASYNC=1` -- and only when the installed release
+has the transport. Routing to a transport the container does not know fails
+every dispatch, so check the constant, not just the extension:
+
+```php
+use Koh\Typo3Async\Domain\AsyncMode;
+use Koh\Typo3Async\Infrastructure\Messenger\Transports;
+use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
+
+if (ExtensionManagementUtility::isLoaded('koh_async')
+    && \defined(Transports::class . '::CACHE')
+    && AsyncMode::fromEnvironment()->isEnabled()
+) {
+    $GLOBALS['TYPO3_CONF_VARS']['SYS']['messenger']['routing'][\Vendor\Site\Message\PurgeSomething::class] = Transports::CACHE;
+}
+```
+
+The consumer decodes only allowed classes (next section), so the message
+class must be on the list as well -- in the consumer, which is where the row
+is read. Add it whenever the extension is installed, not only when you
+route: the consumer may run with different switches than the web pods, and
+a refused row stops it. The message's handler (`#[AsMessageHandler]`) runs in
+the consumer when the message is queued, and in the request when it is not:
+TYPO3's default routing `* => default` is synchronous.
+
+A message carries only scalars and arrays of them, never a service, a
+request or a record object: it is serialized into the database and read back
+in another process, and every class in it has to be on the list.
+
 ## The queue is a trust boundary
 
 A queued message is a serialized PHP object in `sys_messenger_messages`, and
@@ -167,6 +212,8 @@ the list:
 ```php
 // further class-name prefixes a queued message may contain; default none
 $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['koh_async']['messageClassPrefixes'] = ['Vendor\\Site\\Messenger\\'];
+// or one class exactly: an entry without a trailing backslash matches only itself
+$GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['koh_async']['messageClassPrefixes'][] = \Vendor\Site\Message\PurgeSomething::class;
 ```
 
 The wire format is unchanged, so messages queued before an update decode as

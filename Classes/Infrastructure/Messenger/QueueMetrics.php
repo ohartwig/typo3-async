@@ -21,7 +21,7 @@ namespace Koh\Typo3Async\Infrastructure\Messenger;
  */
 final class QueueMetrics
 {
-    public const QUEUES = ['mail', 'images', 'failed'];
+    public const QUEUES = ['mail', 'images', 'cache', 'failed'];
 
     /**
      * @param array<string, array{messages: int, oldestDueAt: int|null}> $queues by queue name

@@ -15,7 +15,7 @@ final class QueueMetricsTest extends TestCase
     {
         $text = QueueMetrics::render([], 1000);
 
-        foreach (['mail', 'images', 'failed'] as $queue) {
+        foreach (['mail', 'images', 'cache', 'failed'] as $queue) {
             self::assertStringContainsString("koh_async_queue_messages{queue=\"$queue\"} 0\n", $text);
             self::assertStringContainsString("koh_async_queue_oldest_age_seconds{queue=\"$queue\"} 0\n", $text);
         }
