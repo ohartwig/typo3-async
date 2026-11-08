@@ -1,5 +1,25 @@
 # Changelog
 
+## [1.5.0](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-async/compare/v1.4.8...v1.5.0) (2026-11-08)
+
+### :sparkles: Features
+
+* **messenger:** add the general-purpose koh_async_cache transport ([a54a889](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-async/commit/a54a8893c7527a47700c0b1264b2cfef5ce5237b))
+
+### :repeat: Chores
+
+* **repo-templates:** sync ([837e7c8](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-async/commit/837e7c8723ba1f024251833736e9da2dc5030887))
+* **repo-templates:** sync ([4a93ef3](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-async/commit/4a93ef35459a78b5ac7cf1cd0be6368896e4f4c8))
+* **deps:** update dependency registry.ole-hartwig.eu/devops/images/franken-php/ci to v3.2.150-8.5 ([c0d52f3](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-async/commit/c0d52f39c947a29dbfd653f1ef9e80ec5e51b72f))
+* **deps:** update dependency registry.ole-hartwig.eu/devops/images/franken-php/ci to v3.2.149-8.5 ([9a262ff](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-async/commit/9a262ffaaca560c2c825eda0113692e9c383e484))
+* **deps:** update dependency registry.ole-hartwig.eu/devops/images/franken-php/ci to v3.2.148-8.5 ([7c8dab6](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-async/commit/7c8dab672d3f70c299758c4dc91a6d01dba54af7))
+* **deps:** update dependency registry.ole-hartwig.eu/devops/images/franken-php/ci to v3.2.147-8.5 ([9d9c81a](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-async/commit/9d9c81aad402960a134a38dc4763faeec8b90143))
+* **deps:** update dependency registry.ole-hartwig.eu/devops/images/franken-php/ci to v3.2.146-8.5 ([ce87a85](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-async/commit/ce87a85bfd1b58a85cbd8e39959002f05d2ec391))
+* **deps:** update dependency registry.ole-hartwig.eu/devops/images/franken-php/ci to v3.2.144-8.5 ([7724968](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-async/commit/7724968ea751a2d832afd18141a6707f8fc6ffdc))
+* **deps:** update dependency registry.ole-hartwig.eu/devops/images/franken-php/ci to v3.2.143-8.5 ([615d4ca](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-async/commit/615d4ca2a74594284b67b88c636ea2a85cd4e4da))
+* **deps:** update dependency registry.ole-hartwig.eu/devops/images/franken-php/ci to v3.2.142-8.5 ([4e769d9](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-async/commit/4e769d9e5cb9b1f64135829f7278f355efb878cf))
+* **deps:** update dependency registry.ole-hartwig.eu/devops/images/franken-php/ci to v3.2.139-8.5 ([b069043](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-async/commit/b069043e43e4be22fe23b81d64bc88e90505ecd5))
+
 ## [1.4.8](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-async/compare/v1.4.6...v1.4.8) (2026-11-06)
 
 ### :bug: Fixes
