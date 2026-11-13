@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.6.0](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-async/compare/v1.5.0...v1.6.0) (2026-11-13)
+
+### :sparkles: Features
+
+* **images:** backfill the variants of images already in use ([7461f70](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-async/commit/7461f70bda69bd69ade60f583f9b69fcb65c6313))
+
+### :repeat: Chores
+
+* **repo-templates:** sync ([bc2f6b9](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-async/commit/bc2f6b94233017987b2c083b526f97c71057a7c9))
+* **deps:** update dependency registry.ole-hartwig.eu/devops/images/franken-php/ci to v3.2.173-8.5 ([962caf1](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-async/commit/962caf10bab7fb2d1d82bebc1fa2cbaa1b29e1ab))
+* **deps:** update dependency registry.ole-hartwig.eu/devops/images/franken-php/ci to v3.2.172-8.5 ([a1a8cca](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-async/commit/a1a8ccad9b476b9d0ff97abe5cee046c88b5fb4a))
+* **deps:** update dependency registry.ole-hartwig.eu/devops/images/franken-php/ci to v3.2.171-8.5 ([16b72cc](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-async/commit/16b72cc65097a5ff73ae140a1c6b15fe1b2ba97c))
+
 ## [1.5.0](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-async/compare/v1.4.8...v1.5.0) (2026-11-08)
 
 ### :sparkles: Features
