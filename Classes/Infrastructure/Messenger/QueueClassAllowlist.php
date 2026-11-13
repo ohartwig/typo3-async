@@ -29,6 +29,7 @@ final class QueueClassAllowlist
     /** @var list<string> */
     public const DEFAULT_PREFIXES = [
         'Koh\Typo3Async\Infrastructure\Image\PregenerateImageVariants',
+        'Koh\Typo3Async\Infrastructure\Image\BackfillImageVariants',
         'Symfony\Component\Messenger\Envelope',
         'Symfony\Component\Messenger\Stamp\\',
         'Symfony\Component\Mailer\Messenger\SendEmailMessage',

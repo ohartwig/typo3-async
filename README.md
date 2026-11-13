@@ -134,6 +134,40 @@ $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['koh_async']['maxUploadMegapixels'] = 
 The consumer must read `koh_async_images` (see Running it) -- otherwise the
 messages wait in the queue.
 
+### Images uploaded before the profiles changed
+
+An upload is prepared with the profiles of its moment. When a template later
+asks for something new -- another width, AVIF beside WebP -- every image
+uploaded before is rendered with the new instructions by the first visitor of
+each page, in the request. On an S3 storage such a render took 1.4 s median
+and 7 s p95 (measured 2026-11-13), against 0.2 s for the same page without it.
+
+A **backfill pass** moves that work to the consumer. It covers every image in
+use -- a live, undeleted file reference to an image that is not missing and
+within `maxUploadMegapixels` -- and, for references with a crop, the cropped
+variants. Variants that already exist cost one lookup each.
+
+- The consumer starts a pass by itself when it starts (hourly) and the
+  profiles differ from those of the last pass: a template change is followed
+  within about two hours of the first renders that taught the learner.
+- A pass queues 50 images, then a message for the next 50 at the end of the
+  queue. The `images` queue never holds more than a batch, so uploads and
+  crops wait at most for one, and the backlog alert stays quiet.
+- A newer pass replaces an older one; the older stops at its next batch.
+
+By hand, for what the consumer cannot see (a GFX setting such as
+`avif_quality`, a storage moved, processed files removed):
+
+```bash
+vendor/bin/typo3 koh-async:image-variants:backfill          # only if the profiles changed
+vendor/bin/typo3 koh-async:image-variants:backfill --force  # always
+```
+
+```php
+// start a pass when the consumer finds the profiles changed; default true
+$GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['koh_async']['backfillOnProfileChange'] = true;
+```
+
 ### Run the images queue on its own consumer
 
 One worker reading both queues handles a message to its end before it polls

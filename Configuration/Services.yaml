@@ -7,7 +7,8 @@
 # being split between this file and the project configuration.
 #
 #   koh_async_mail    queue `mail`: rendered mails waiting for the SMTP server
-#   koh_async_images  queue `images`: image variants to produce after an upload
+#   koh_async_images  queue `images`: image variants to produce after an upload,
+#                     and the batches of a backfill pass for images in use
 #   koh_async_cache   queue `cache`: general purpose, for short idempotent work
 #                     other extensions take out of the request (edge cache
 #                     purges); nothing here routes to it
@@ -164,6 +165,18 @@ services:
     public: true
 
   Koh\Typo3Async\Infrastructure\Image\PregenerateImageVariantsHandler:
+    tags:
+      - name: 'messenger.message_handler'
+
+  # A backfill pass (ImageVariantsBackfill): the command and the consumer's
+  # start listener dispatch its first message, the handler each next one.
+  Koh\Typo3Async\Infrastructure\Image\ImageVariantsBackfill:
+    arguments:
+      $bus: '@messenger.bus.default'
+
+  Koh\Typo3Async\Infrastructure\Image\BackfillImageVariantsHandler:
+    arguments:
+      $bus: '@messenger.bus.default'
     tags:
       - name: 'messenger.message_handler'
 

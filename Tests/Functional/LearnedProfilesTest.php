@@ -36,6 +36,9 @@ final class LearnedProfilesTest extends FunctionalTestCase
     protected function setUp(): void
     {
         putenv(AsyncMode::ENVIRONMENT_VARIABLE . '=1');
+        // Passes have their own test (ImageVariantsBackfillTest); here a
+        // consumer start must not queue one beside the uploads under test.
+        $this->configurationToUseInTestInstance = ['EXTENSIONS' => ['koh_async' => ['backfillOnProfileChange' => false]]];
         parent::setUp();
         $this->get(StorageRepository::class)->createLocalStorage('fileadmin', 'fileadmin/', 'relative', '', true);
         // Uploads are an editor's: without a backend user nothing is queued.

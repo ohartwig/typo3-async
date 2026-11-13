@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Koh\Typo3Async\Domain\AsyncMode;
+use Koh\Typo3Async\Infrastructure\Image\BackfillImageVariants;
 use Koh\Typo3Async\Infrastructure\Image\PregenerateImageVariants;
 use Koh\Typo3Async\Infrastructure\Image\QueueCroppedReferences;
 use Symfony\Component\Mailer\Messenger\SendEmailMessage;
@@ -16,6 +17,7 @@ defined('TYPO3') or exit;
 if (AsyncMode::fromEnvironment()->isEnabled()) {
     $GLOBALS['TYPO3_CONF_VARS']['SYS']['messenger']['routing'][SendEmailMessage::class] = 'koh_async_mail';
     $GLOBALS['TYPO3_CONF_VARS']['SYS']['messenger']['routing'][PregenerateImageVariants::class] = 'koh_async_images';
+    $GLOBALS['TYPO3_CONF_VARS']['SYS']['messenger']['routing'][BackfillImageVariants::class] = 'koh_async_images';
 }
 
 $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['t3lib/class.t3lib_tcemain.php']['processDatamapClass']['koh_async'] = QueueCroppedReferences::class;

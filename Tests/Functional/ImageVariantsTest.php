@@ -52,6 +52,9 @@ final class ImageVariantsTest extends FunctionalTestCase
                     'imageProfiles' => json_encode([self::FILE_PROFILE, self::REFERENCE_PROFILE]),
                     // Listed profiles only: LearnedProfilesTest covers learning.
                     'learnImageProfiles' => 0,
+                    // Passes have their own test (ImageVariantsBackfillTest); here a
+                    // consumer start must not queue one beside the message under test.
+                    'backfillOnProfileChange' => false,
                 ],
             ],
         ];
