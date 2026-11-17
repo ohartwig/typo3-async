@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.6.2](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-async/compare/v1.6.1...v1.6.2) (2026-11-17)
+
+### :bug: Fixes
+
+* **composer:** point homepage at the package page ([533d4cb](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-async/commit/533d4cb042a77d038652901dc29643ee2f6d5679))
+
+### :repeat: Chores
+
+* **deps:** update dependency registry.ole-hartwig.eu/devops/images/franken-php/ci to v3.2.246-8.5 ([3cdb99a](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-async/commit/3cdb99a5c0633ce4d9da25d360c0a50271ed8c06))
+
 ## [1.6.1](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-async/compare/v1.6.0...v1.6.1) (2026-11-14)
 
 ### :repeat: Chores
