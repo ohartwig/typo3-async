@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.6.3](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-async/compare/v1.6.2...v1.6.3) (2026-11-21)
+
+### :repeat: Chores
+
+* **deps:** update dependency ergebnis/composer-normalize to ^2.58.0 ([4cacad8](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-async/commit/4cacad8de405215d173f73d9ecea2b06efe0a319))
+
 ## [1.6.2](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-async/compare/v1.6.1...v1.6.2) (2026-11-17)
 
 ### :bug: Fixes
