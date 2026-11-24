@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.6.4](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-async/compare/v1.6.3...v1.6.4) (2026-11-24)
+
+### :repeat: Chores
+
+* **deps:** update dependency phpstan/phpstan-deprecation-rules to ^2.0.6 ([735edcc](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-async/commit/735edccfd6c7cd6110df2da2eeb3d6a38cfa815c))
+* **deps:** update lefthook hook images ([21bd742](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-async/commit/21bd742eaccc3a220418a2c8a459fe2dd401d8ca))
+
 ## [1.6.3](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-async/compare/v1.6.2...v1.6.3) (2026-11-21)
 
 ### :repeat: Chores
