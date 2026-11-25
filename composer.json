@@ -28,15 +28,15 @@
         "php": "^8.3",
         "psr/container": "^2.0.2",
         "psr/log": "^3.0.2",
-        "symfony/doctrine-messenger": "^7.4.23",
+        "symfony/doctrine-messenger": "^7.4.24",
         "symfony/mailer": "^7.4.22",
-        "symfony/messenger": "^7.4.23",
+        "symfony/messenger": "^7.4.24",
         "symfony/mime": "^7.4.22",
         "typo3/cms-core": "^14.3"
     },
     "require-dev": {
         "deptrac/deptrac": "^4.7.2",
-        "ergebnis/composer-normalize": "^2.58.0",
+        "ergebnis/composer-normalize": "^2.59.0",
         "koh/dev-typo3": "^1.0",
         "phpstan/phpstan-deprecation-rules": "^2.0.6",
         "phpunit/phpunit": "^12.5 || ^13.4.3",
