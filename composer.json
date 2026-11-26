@@ -29,7 +29,7 @@
         "psr/container": "^2.0.2",
         "psr/log": "^3.0.2",
         "symfony/doctrine-messenger": "^7.4.24",
-        "symfony/mailer": "^7.4.22",
+        "symfony/mailer": "^7.4.24",
         "symfony/messenger": "^7.4.24",
         "symfony/mime": "^7.4.22",
         "typo3/cms-core": "^14.3"
