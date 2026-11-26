@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.6.6](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-async/compare/v1.6.5...v1.6.6) (2026-11-26)
+
+### :bug: Fixes
+
+* **deps:** update dependency symfony/mailer to ^7.4.24 [security] ([444ef56](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-async/commit/444ef56106e2d459681d81a7ef0a9f038693de42))
+* **deps:** update composer packages to ^7.4.24 ([63720e6](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-async/commit/63720e661d072fc608d4a79e45977e65c71223b4))
+
 ## [1.6.5](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-async/compare/v1.6.4...v1.6.5) (2026-11-25)
 
 ### :bug: Fixes
