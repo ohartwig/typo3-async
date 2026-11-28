@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.6.7](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-async/compare/v1.6.6...v1.6.7) (2026-11-28)
+
+### :repeat: Chores
+
+* **deps:** update dependency symfony/dependency-injection to ^7.4.25 ([208e133](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-async/commit/208e133efbb88a4b02517b9241db1c4158a4921a))
+
 ## [1.6.6](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-async/compare/v1.6.5...v1.6.6) (2026-11-26)
 
 ### :bug: Fixes
