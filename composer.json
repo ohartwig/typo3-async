@@ -41,7 +41,7 @@
         "phpstan/phpstan-deprecation-rules": "^2.0.6",
         "phpunit/phpunit": "^12.5 || ^13.4.3",
         "typo3/testing-framework": "^9.7.0",
-        "symfony/dependency-injection": "^7.4.24"
+        "symfony/dependency-injection": "^7.4.25"
     },
     "repositories": [
         {
